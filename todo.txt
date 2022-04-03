@@ -1,0 +1,3 @@
+create objdef with attributes button on appdef
+create the normal metadata
+create normal data
