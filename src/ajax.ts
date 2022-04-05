@@ -12,18 +12,18 @@ async function createOne(data:any){
     return createMany([data])
 }
 
-async function query(query){
+async function query(query,sort){
     return fetch('/api/query',{
         method:'POST',
         headers:{
             'Content-Type': 'application/json'
         },
-        body:JSON.stringify(query)
+        body:JSON.stringify({filter:query,sort:sort})
     }).then(res => res.json())
 }
 
 async function queryOne(querydata){
-    var res = await query(querydata)
+    var res = await query(querydata,{})
     return res[0]
 }
 

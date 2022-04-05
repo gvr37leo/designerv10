@@ -16,6 +16,7 @@
 /// <reference path="src/widgets/text.ts" />
 /// <reference path="src/ajax.ts" />
 /// <reference path="src/utils.ts" />
+/// <reference path="src/domutils.ts" />
 
 
 declare var ejs:{compile:(template:string) => (data:any) => string}
@@ -35,8 +36,4 @@ root.appendChild(designer.html)
 // updateHTML()
 
 //exporting from this
-
-
-
-
 

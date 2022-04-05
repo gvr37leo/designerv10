@@ -7,6 +7,11 @@ class Designer{
     treeviewcontainer: HTMLElement;
     dtviewcontainer: HTMLElement;
     treeview: TreeView;
+    entitymap;
+    entitymapbyname;
+    groupbyparent;
+    groupbytype;
+    maincontainer: any;
     
     constructor(){
         this.router = new Router()
@@ -46,22 +51,34 @@ class Designer{
             
         })
 
+        this.router.locationListen()
         await this.refresh()
         
     }
 
     async refresh(){
-        this.allentitys = await query({})
+        this.allentitys = await query({},{})
+        this.entitymap = mapify(this.allentitys,e => e._id)
+        this.entitymapbyname = mapify(this.allentitys,e => e.name)
+        this.groupbyparent = groupby(this.allentitys,e => e.parent)
+        this.groupbytype = groupby(this.allentitys,e => e.type)
         this.treeview.load()
         upsertChild(this.treeviewcontainer,this.treeview.render())
         this.router.trigger(window.location.pathname)
     }
 
     render(){
-        this.html = stringToHTML(`<div style='display:flex'>
-            <div id="treeviewcontainer"></div>
-            <div id="dtviewcontainer" style="margin-left:10px;"></div>
+        this.html = stringToHTML(`<div>
+            <div id="headercontainer"></div>
+            <div id="maincontainer">
+                <div style='display:flex'>
+                    <div id="treeviewcontainer"></div>
+                    <div id="dtviewcontainer" style="margin-left:10px;"></div>
+                </div>
+            </div>
+            <div id="footer"></div>
         </div>`)
+        this.maincontainer = this.html.querySelector('#maincontainer')
         this.treeviewcontainer = this.html.querySelector('#treeviewcontainer')
         this.dtviewcontainer = this.html.querySelector('#dtviewcontainer')
         // this.dtviewcontainer.appendChild(this.dtview.render())

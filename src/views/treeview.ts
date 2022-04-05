@@ -18,7 +18,7 @@ class TreeView{
 
         this.childcontainer = this.html.querySelector('#childcontainer')
 
-        var roots = designer.allentitys.filter(e => e.parent == null)
+        var roots = children(null)
         for(var root of roots){
             this.childcontainer.appendChild(this.treeitemsmap.get(root._id).render())
         }
@@ -27,7 +27,7 @@ class TreeView{
     }
 
     load(){
-        var roots = designer.allentitys.filter(e => e.parent == null)
+        var roots = children(null)
         for(var root of roots){
             var treeitem = new TreeItem(root,this)
             treeitem.load()
@@ -47,8 +47,8 @@ class TreeItem{
     }
 
     load(){
-        var children = designer.allentitys.filter(e => e.parent == this.entity._id)
-        this.children = children.sort((a,b) => a.sortorder - b.sortorder)
+        var fchildren = children(this.entity._id)
+        this.children = fchildren.sort((a,b) => a.sortorder - b.sortorder)
 
         for(var child of this.children){
             var treeitem = new TreeItem(child,this.treeview) 
@@ -60,11 +60,13 @@ class TreeItem{
     render(){
         // var children = designer.allentitys.filter(e => e.parent == this.entity._id)
         this.html = stringToHTML(`<div>
-            <div id="namecontainer" style="display:flex;">
-                <span id="openindicator">v</span>
-                <a href="/entity/${this.entity._id}">${this.entity.name}</a>
-            </div>
-            <div id="treeitemchildren" style="margin-left:10px;">
+            <a href="/entity/${this.entity._id}">
+                <div id="namecontainer" style="display:flex; padding:5px;">
+                    <span id="openindicator" style="margin-right:3px; cursor:pointer;">v</span>
+                    <span>${this.entity.name}</span>
+                </div>
+            </a>
+            <div id="treeitemchildren" style="margin-left:20px;">
                 
             </div>
         </div>`)
@@ -79,6 +81,8 @@ class TreeItem{
         
         this.updateOpenIndicator()
         this.html.querySelector('#openindicator').addEventListener('click',(e:any) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.setOpen(!this.open)
         })
 

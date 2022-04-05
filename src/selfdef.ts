@@ -203,7 +203,7 @@ function generateSelfDef(){
     genDefaultAttributes(signup._id,selfdefEntitys)
     dothething(new Attribute({
         parent:signup._id,
-        name:'player',
+        name:'signup_player',
         datatype:'pointer',
         pointertype:'Player'
     }))
@@ -246,25 +246,18 @@ function generateSelfDef(){
 
 function IDifyPointers(entitys){
 
-    // var objdef = findbyname(entitys,'ObjectDef')
     var objdefs = entitys.filter(e => e.type == 'ObjectDef')
-    // var datatype = findbyname(objdefs,'Datatype')
     var datatypes = entitys.filter(e => e.type == 'DataType')
 
     for(var entity of entitys){
-        var entitytype = findbyname(objdefs,entity.type)
+        var entitytype = objdefs.find(e => e.name == entity.type)
         entity.type = entitytype._id
         if(entity.datatype){
-            entity.datatype = findbyname(datatypes,entity.datatype)._id
+            entity.datatype = datatypes.find(e => e.name == entity.datatype)._id
         }
         if(entity.pointertype){
-            entity.pointertype = findbyname(objdefs,entity.pointertype)._id
+            entity.pointertype = objdefs.find(e => e.name == entity.pointertype)._id
         }
-        // if(entitytype.name == 'Attribute'){
-        //     var tempdatatype = entity.datatype
-        //     if(tempdatatype == 'pointer'){
-        //     }
-        // }
     }
 }
 
@@ -336,6 +329,19 @@ function mapify(arr,cb){
     var map = {}
     for(var item of arr){
         map[cb(item)] = item
+    }
+    return map
+}
+
+function groupby(arr,cb){
+    var map = {}
+    for(var item of arr){
+        var key = cb(item)
+        if(map[key]){
+            map[key].push(item)
+        }else{
+            map[key] = [item]
+        }
     }
     return map
 }

@@ -45,9 +45,9 @@ class pointerWidget{
     }
 
     getValue(){
-        var input = this.html.querySelector('input').value
+        var input = this.html.querySelector('input')
         if(input.value){
-            return parseInt(input)
+            return parseInt(input.value)
         }else{
             return null
         }

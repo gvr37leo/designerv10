@@ -28,6 +28,12 @@ class Router{
     navigateID(id){
         this.navigate(`/entity/${id}`)
     }
+
+    locationListen(){
+        window.addEventListener('popstate', () => {
+            this.trigger(window.location.pathname)
+        });
+    }
 }
 
 class RouteRegistration{

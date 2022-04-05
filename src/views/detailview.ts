@@ -26,56 +26,16 @@ class DetailView{
         this.entity = entity
         
 
-        var objectdef = findbyname(designer.allentitys,'ObjectDef') 
-        this.allObjectDefs = designer.allentitys.filter(e => e.type == objectdef._id)
-        var attributeObjectDef = findbyname(this.allObjectDefs,'Attribute')
-        this.allAttributes = designer.allentitys.filter(e => e.type == attributeObjectDef._id)
+        this.allObjectDefs = designer.groupbytype[findbyname('ObjectDef')._id]
+        this.allAttributes = designer.groupbytype[findbyname('Attribute')._id]
+        this.datatypes = designer.groupbytype[findbyname('DataType')._id]
 
-        this.metaEntity = this.allObjectDefs.find(e => e._id == this.entity.type)
-        this.metaAttributes = this.allAttributes.filter(a => a.parent == this.metaEntity._id)
-
-        var datatypeObjDef = findbyname(this.allObjectDefs,'DataType')
-        this.datatypes = designer.allentitys.filter(e => e.type == datatypeObjDef._id)
-
-
-
-        // var res = await query(new Query({
-        //     filters:[
-        //         new Filter({attribute:'name',operator:'=',value:entity.type}),
-        //         new Filter({attribute:'type',operator:'=',value:'objdef'}),
-        //     ],
-        //     derefences:[
-        //         new Dereference({//this derefrence should get the children of an objdef which are attributes
-        //             attribute:'parent',
-        //             direction:'down',
-        //             query:new Query({
-        //                 derefences:[
-        //                     new Dereference({//this dereference should get the datatype
-        //                         attribute:'datatype',
-        //                     })
-        //                 ]
-        //             })
-        //         })
-        //     ]
-        // },))
-
-        // res.attributes
-        // res.objdef
-        // res.datatypes
-        // res.appdef
+        this.metaEntity = deref(this.entity.type)
+        this.metaAttributes = children(this.metaEntity._id)
     }
-
-
-
-    //list of backrefs
 
     render(){
         var that = this
-        //look at entitytype
-        //find the object that has that type/name
-        //find the child attributes
-        //check the datatype of the attributes
-        //so query could be 
 
         var widgets = {
             id:IDWidget,
@@ -85,13 +45,6 @@ class DetailView{
             datetime:datetimeWidget,
             bool:boolWidget,
         }
-        
-        // return <div>
-        //     {JSON.stringify(this.metaEntity)}
-        //     {JSON.stringify(this.entity)}
-        //     {JSON.stringify(this.attributes)}
-        //     {JSON.stringify(this.datatypes)}
-        // </div>
 
         this.html = stringToHTML(`<div>
             <h1>${this.entity.name}</h1>
@@ -104,15 +57,18 @@ class DetailView{
             <div id="attributecontainer">
                 
             </div>
-            <div style="margin:10px;">
+            <div style="margin:10px; border:1px solid black; padding:5px; border-radius:3px;">
                 <div style="margin-bottom:10px;" id="backrefcontainer"></div>
                 <div id="listviewcontainer"></div>
             </div>
         </div>`)
+        
+        this.backrefcontainer = qs(this.html,'#backrefcontainer')
+        this.listview.metaAttributes = children(findbyname('Entity')._id)
         upsertChild(this.html.querySelector('#listviewcontainer') ,this.listview.render())
 
         
-        if(this.entity.type == findbyname(this.allObjectDefs,'AppDef')._id){//todo
+        if(this.entity.type == findbyname('AppDef')._id){
             var button = stringToHTML(`<button>create ObjDef</button>`)
             button.addEventListener('click',async () => {
                 var objdef = addRandomID(new ObjectDef({
@@ -127,13 +83,13 @@ class DetailView{
             qs(this.html,'#btncontainer').appendChild(button)
         }
 
-        if(this.entity.type == findbyname(this.allObjectDefs,'ObjectDef')._id){//todo
+        if(this.entity.type == findbyname('ObjectDef')._id){
             var button = stringToHTML(`<button>create Attribute</button>`)
             button.addEventListener('click',async () => {
                 var objdef = addRandomID(new Attribute({
                     name:'new attribute',
                     parent:this.entity._id,
-                    datatype:findbyname(this.datatypes,'string')._id //todo
+                    datatype:findbyname('string')._id
                 }))
                 await createOne(objdef)
                 designer.refresh()
@@ -144,11 +100,11 @@ class DetailView{
         qs(this.html,'#btncreate').addEventListener('click',async () => {
             var res = await createOne({
                 name:'new entity',
-                type:findbyname(this.allObjectDefs,'Entity')._id,//todo
+                type:findbyname('Entity')._id,
                 parent:this.entity._id,
             })
-            designer.router.navigateID(res.insertedIds[0])
-            designer.refresh()
+            await designer.refresh()
+            // designer.router.navigateID(res.insertedIds[0])
         })
 
         this.html.querySelector('#btnduplicate').addEventListener('click',async () => {
@@ -173,29 +129,15 @@ class DetailView{
         })
 
 
-        //type,datatype,pointertype
-
-        this.backrefcontainer = qs(this.html,'#backrefcontainer')
-        //find all the attributes that point to this entity's type
-        var pointerattributes = designer.allentitys.filter(e => e.datatype == findbyname(this.datatypes,'pointer')._id &&  (e.pointertype == findbyname(this.allObjectDefs,'Entity')._id || e.pointertype == this.entity.type))//todo*2
-        var somemap = mapify(pointerattributes,a => a.name)
-        for(let attribute of Object.values<any>(somemap)){
-            let button = stringToHTML(`<button>${attribute.name}</button>`)
-            button.addEventListener('click',() => {
-                this.listview.query({[attribute.name]:this.entity._id})
-            })
-            this.backrefcontainer.appendChild(button)
-        }
-
-
+        //render attributes--------------------------
         this.attributecontainer = this.html.querySelector('#attributecontainer')
         for(let attribute of this.metaAttributes.sort((a,b) => a.sortorder - b.sortorder)){
 
-            var reffedDatatype = this.datatypes.find(e => e._id == attribute.datatype)
+            let reffedDatatype = this.datatypes.find(e => e._id == attribute.datatype)
             let widget = new widgets[reffedDatatype.name]//todo
             this.widgetrefs[attribute.name] = widget
             let attributeitem = stringToHTML(`<div>
-                <div style="font-weight:bold;">${attribute.name}</div>
+                <div style="font-weight:bold; margin-top:10px;">${attribute.name}</div>
                 <div id="widgetcontainer"></div>
             </div>`)
             attributeitem.querySelector('#widgetcontainer').appendChild(
@@ -203,14 +145,53 @@ class DetailView{
             )
             this.attributecontainer.appendChild(attributeitem)
         }
+        //render attributes end------------------
+
+        //backrefs buttons-----------------------
+        let tempbutton = scr('button');text('parent');flush();
+        tempbutton.addEventListener('click',() => {
+            this.listview.metaAttributes = children(findbyname('Entity')._id)
+            this.listview.query({parent:this.entity._id},{})
+        })
+        this.backrefcontainer.appendChild(tempbutton)
+
+        var pointerattributes = designer.allentitys.filter(e => e.datatype == findbyname('pointer')._id && (e.pointertype == this.entity.type) && deref(e.type).name == 'Attribute')
+        for(let attribute of pointerattributes){
+            let button = stringToHTML(`<button>${deref(attribute.parent).name}.${attribute.name}</button>`)
+            button.addEventListener('click',() => {
+                this.listview.metaAttributes = children(attribute.parent)
+                var query = {
+                    type:attribute.parent,
+                }
+                Object.assign(query,{[attribute.name]:this.entity._id})
+                this.listview.query(query,{})
+            })
+            this.backrefcontainer.appendChild(button)
+        }
+        //backrefs buttons end-----------------------
+
+
+        
         return this.html    
     }
 }
 
-function findbyname(array,name){
-    return array.find(e => e.name == name)
+function findbyname(name){
+    return designer.entitymapbyname[name]
 }
 
 function deref(id){
-    return designer.allentitys.find(e => e._id == id)
+    return designer.entitymap[id]
+}
+
+function siblings(id){
+    return children(deref(id).parent)
+}
+
+function children(id){
+    if(designer.groupbyparent[id]){
+        return designer.groupbyparent[id]
+    }else{
+        return []
+    }
 }

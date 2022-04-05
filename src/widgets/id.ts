@@ -6,7 +6,7 @@ class IDWidget{
     }
 
     render(object:Entity,attribute:Attribute){
-        this.html = stringToHTML(`<input type="text"></input>`) as HTMLInputElement
+        this.html = stringToHTML(`<input type="text" readonly></input>`) as HTMLInputElement
         this.html.value = object[attribute.name]
         return this.html
     }

@@ -48,7 +48,7 @@ async function start(){
             // if(req.body._id){
             //     req.body._id = new mongodb.ObjectId(req.body._id)
             // }
-            var cursor = collection.find(req.body)
+            var cursor = collection.find(req.body.filter).sort(req.body.sort)
             var result = await cursor.toArray()
             
             res.send(result)
@@ -62,17 +62,29 @@ async function start(){
         })
     
         app.delete('/api/delete',async function(req, res){
-            var result = await recursiveDelete(req.body)
+            //query everything and just do a recursive lookup in memory and delete everything at once
+            var everything = await collection.find({}).toArray()
+            var descendantids = descendants(everything,req.body._id)
+            descendantids.push(req.body._id)
+            var result = await collection.deleteMany({_id:{$in:descendantids}})
             res.send(result)
         })
 
-        async function recursiveDelete(entity){
-            var children = await collection.find({parent:entity._id}).toArray()
-            for(var child of children){
-                await recursiveDelete(child)
-            }
-            return remove(entity)
+
+        function descendants(everything,selfid){
+            var children = everything.filter(e => e.parent == selfid)
+            var childdescendants = children.flatMap(child => descendants(everything,child._id))
+            return children.map(e => e._id).concat(childdescendants)
+
         }
+
+        // async function recursiveDelete(entity){
+        //     var children = await collection.find({parent:entity._id}).toArray()
+        //     for(var child of children){
+        //         await recursiveDelete(child)
+        //     }
+        //     return remove(entity)
+        // }
 
         async function remove(entity){
             //update backrefs

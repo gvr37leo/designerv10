@@ -1,3 +1,19 @@
-create objdef with attributes button on appdef
-create the normal metadata
-create normal data
+
+
+header
+parent/type buttons acting up
+listview sort
+
+
+
+(optional)--------
+listview filter/sort ui
+toaster
+some sort of way to suggest child types
+advanced text editor
+structs
+sortorder (either sortorder or linkedlist)
+some way to paginate or stream entities in and out of memory/ui (paginate treeview?)
+security logins loginproviders rbac
+mongodb indexes
+online hosting
