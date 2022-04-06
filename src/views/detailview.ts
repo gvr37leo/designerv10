@@ -148,14 +148,23 @@ class DetailView{
         //render attributes end------------------
 
         //backrefs buttons-----------------------
-        let tempbutton = scr('button');text('parent');flush();
-        tempbutton.addEventListener('click',() => {
+        let parentbutton = scr('button');text('children');flush();
+        parentbutton.addEventListener('click',() => {
             this.listview.metaAttributes = children(findbyname('Entity')._id)
             this.listview.query({parent:this.entity._id},{})
         })
-        this.backrefcontainer.appendChild(tempbutton)
+        this.backrefcontainer.appendChild(parentbutton)
 
-        var pointerattributes = designer.allentitys.filter(e => e.datatype == findbyname('pointer')._id && (e.pointertype == this.entity.type) && deref(e.type).name == 'Attribute')
+        if(this.entity.type == findbyname('ObjectDef')._id){
+            let typebutton = scr('button');text('type');flush();
+            typebutton.addEventListener('click',() => {
+                this.listview.metaAttributes = children(findbyname('Entity')._id)
+                this.listview.query({type:this.entity._id},{})
+            })
+            this.backrefcontainer.appendChild(typebutton)
+        }
+
+        var pointerattributes = designer.groupbytype[findbyname('Attribute')._id].filter(e => e.datatype == findbyname('pointer')._id && (e.pointertype == this.entity.type) && e.name != 'type')
         for(let attribute of pointerattributes){
             let button = stringToHTML(`<button>${deref(attribute.parent).name}.${attribute.name}</button>`)
             button.addEventListener('click',() => {

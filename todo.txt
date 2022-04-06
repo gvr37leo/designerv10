@@ -1,14 +1,13 @@
 
-
 header
-parent/type buttons acting up
-listview sort
 
 
 
 (optional)--------
 listview filter/sort ui
 toaster
+localization
+history
 some sort of way to suggest child types
 advanced text editor
 structs
