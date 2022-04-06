@@ -17,39 +17,26 @@ class ListView{
     //delete
 
     render(){
-
-        this.html = stringToHTML(`<div>
-            <div style="margin-bottom:5px;">
-                <input placeholder="filter" id="inputsearch"></input>
-                <input placeholder="sort" id="inputsort"></input>
-                <button id="btnsearch">search</button>
-            </div>
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>`)
-
-        this.inputsearch = qs(this.html,'#inputsearch')
-        this.inputsort = qs(this.html,'#inputsort')
-        this.theadrow = qs(this.html,'thead tr')
-        this.tbody = qs(this.html,'tbody')
-
-        this.inputsearch.addEventListener('keydown',(e) => {
-            if(e.key == 'Enter'){
-                this.query(parseJSON(this.inputsearch.value),parseJSON(this.inputsort))
-            }
-        })
-
-        qs(this.html,'#btnsearch').addEventListener('click',async () => {
-            this.query(parseJSON(this.inputsearch.value),parseJSON(this.inputsort.value))
-        })
+        this.html = cr('div')
+            cr('div',{style:"margin-bottom:5px;"})
+                this.inputsearch = crend('input',{placeholder:'filter'})
+                this.inputsearch.addEventListener('keydown',(e) => {
+                    if(e.key == 'Enter'){
+                        this.query(parseJSON(this.inputsearch.value),parseJSON(this.inputsort))
+                    }
+                })
+                this.inputsort = crend('input',{placeholder:'sort'})
+                cr('button');text('search');end().addEventListener('click',async () => {
+                    this.query(parseJSON(this.inputsearch.value),parseJSON(this.inputsort.value))
+                });
+            end();
+            cr('div')
+                cr('table')
+                    cr('thead');this.theadrow = crend('tr');end()
+                    this.tbody = crend('tbody')
+                end();
+            end();
+        end();
 
         return this.html
     }
@@ -62,14 +49,14 @@ class ListView{
         
         var result = await query(filter,sort)
         for(var attribute of this.metaAttributes){
-            this.theadrow.appendChild(stringToHTML(`<td>${attribute.name}</td>`))
+            this.theadrow.appendChild(cr('td'));text(attribute.name);end();
         }
         if(result.length == 0){
             return
         }
 
         for(let entity of result){
-            var row = this.tbody.appendChild(stringToHTML(`<tr></tr>`))
+            var row = this.tbody.appendChild(crend('tr'))
             for(let attribute of this.metaAttributes){
                 let datatype = deref(attribute.datatype)
                 if(datatype.name == 'id'){

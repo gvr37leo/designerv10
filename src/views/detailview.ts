@@ -136,11 +136,11 @@ class DetailView{
             let reffedDatatype = this.datatypes.find(e => e._id == attribute.datatype)
             let widget = new widgets[reffedDatatype.name]//todo
             this.widgetrefs[attribute.name] = widget
-            let attributeitem = stringToHTML(`<div>
-                <div style="font-weight:bold; margin-top:10px;">${attribute.name}</div>
-                <div id="widgetcontainer"></div>
-            </div>`)
-            attributeitem.querySelector('#widgetcontainer').appendChild(
+            let attributeitem = cr('div')
+                cr('div',{style:'font-weight:bold; margin-top:10px;'});text(attribute.name);end();
+                var widgetcontainer = crend('div');
+            end();
+            widgetcontainer.appendChild(
                 this.attributecontainer.appendChild(widget.render(this.entity,attribute))
             )
             this.attributecontainer.appendChild(attributeitem)
@@ -148,7 +148,7 @@ class DetailView{
         //render attributes end------------------
 
         //backrefs buttons-----------------------
-        let parentbutton = scr('button');text('children');flush();
+        let parentbutton = cr('button');text('children');flush();
         parentbutton.addEventListener('click',() => {
             this.listview.metaAttributes = children(findbyname('Entity')._id)
             this.listview.query({parent:this.entity._id},{})
@@ -156,7 +156,7 @@ class DetailView{
         this.backrefcontainer.appendChild(parentbutton)
 
         if(this.entity.type == findbyname('ObjectDef')._id){
-            let typebutton = scr('button');text('type');flush();
+            let typebutton = cr('button');text('type');flush();
             typebutton.addEventListener('click',() => {
                 this.listview.metaAttributes = children(findbyname('Entity')._id)
                 this.listview.query({type:this.entity._id},{})

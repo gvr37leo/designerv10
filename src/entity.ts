@@ -8,17 +8,6 @@ class Entity{
     updatedAt
     status
 
-    //           field   list of entitys whose field references this entity
-    // backrefs:{[key:string]:number[]} = {}
-    /* 
-    {
-        parent:[132465,734545,723545,46233523],
-        type:[67353,72354,623462,26234]
-        datatype:[62324,234265,23424,2352134]
-    }
-
-    
-    */
     constructor(data:Partial<Entity>){
         Object.assign(this,data)
     }

@@ -21,6 +21,11 @@ function cr(tag,attributes = {}):HTMLElement{
     return element
 }
 
+function crend(tag,attributes = {}){
+    cr(tag,attributes)
+    return end()
+}
+
 function text(data:string){
     var textnode = document.createTextNode(data)
     peek().appendChild(textnode)

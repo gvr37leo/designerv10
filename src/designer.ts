@@ -29,26 +29,27 @@ class Designer{
             upsertChild(this.dtviewcontainer,this.dtview.render())
             this.treeview.treeitemsmap.get(ent._id).setOpen(true)
             upsertChild(this.treeviewcontainer,this.treeview.render())
-            var selecteditem = qs(this.treeview.treeitemsmap.get(ent._id).html,'#namecontainer')
+            var selecteditem = this.treeview.treeitemsmap.get(ent._id).namecontainer
             selecteditem.style.backgroundColor = 'yellow'
         })
 
 
         this.router.listen(/./, () => {
-            var html = stringToHTML(`<div>
-                <button id="btndelete">delete all</button>
-                <button id="btnbootstrap">bootstrap mongo</button>
-                frontpage
-            </div>`)
-            html.querySelector('#btndelete').addEventListener('click',async () => {
-                await remove({})
-                await designer.refresh()
-            })
-            html.querySelector('#btnbootstrap').addEventListener('click',async () => {
-                this.bootstrapMongoDB()
-            })
+
+            var html = cr('div')
+                cr('button').addEventListener('click',async () => {
+                    await remove({})
+                    await designer.refresh()
+                })
+                    text('delete all')
+                end();
+                cr('button').addEventListener('click',async () => {
+                    this.bootstrapMongoDB()
+                });
+                    text('bootstrap mongo');
+                end();
+            end();
             upsertChild(this.dtviewcontainer,html)
-            
         })
 
         this.router.locationListen()

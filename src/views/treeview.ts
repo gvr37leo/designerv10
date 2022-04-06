@@ -10,13 +10,9 @@ class TreeView{
     }
     
     render(){
-        this.html = stringToHTML(`<div>
-            <div id="childcontainer" style={{display:'flex',flexDirection:'column'}}>
-                
-            </div>
-        </div>`)
-
-        this.childcontainer = this.html.querySelector('#childcontainer')
+        this.html = cr('div')
+            this.childcontainer = crend('div',{style:'display:flex,flex-direction:column;'})
+        end();
 
         var roots = children(null)
         for(var root of roots){
@@ -41,6 +37,8 @@ class TreeItem{
     treeitemchildren: HTMLElement
     open = false
     children: Entity[] = []
+    openindicator: HTMLElement
+    namecontainer: HTMLElement
 
     constructor(public entity:Entity, public treeview:TreeView){
         treeview.treeitemsmap.set(entity._id,this)
@@ -58,29 +56,22 @@ class TreeItem{
     }
 
     render(){
-        // var children = designer.allentitys.filter(e => e.parent == this.entity._id)
-        this.html = stringToHTML(`<div>
-            <a href="/entity/${this.entity._id}">
-                <div id="namecontainer" style="display:flex; padding:5px;">
-                    <span id="openindicator" style="margin-right:3px; cursor:pointer;">v</span>
-                    <span>${this.entity.name}</span>
-                </div>
-            </a>
-            <div id="treeitemchildren" style="margin-left:20px;">
-                
-            </div>
-        </div>`)
-        this.treeitemchildren = this.html.querySelector('#treeitemchildren')
+        this.html = cr('div')
+            cr('a',{href:`/entity/${this.entity._id}`})
+                this.namecontainer = cr('div',{style:'display:flex; padding:5px;'})
+                    this.openindicator = cr('span',{style:'margin-right:3px; cursor:pointer;'});text('v');end();
+                    cr('span');text(this.entity.name);end()
+                end();
+            end();
+            this.treeitemchildren = crend('div',{style:'margin-left:20px;'})
+        end();
         
         for(var child of this.children){
             this.treeitemchildren.appendChild(this.treeview.treeitemsmap.get(child._id).render())
         }
         
-        
-
-        
         this.updateOpenIndicator()
-        this.html.querySelector('#openindicator').addEventListener('click',(e:any) => {
+        this.openindicator.addEventListener('click',(e:any) => {
             e.preventDefault();
             e.stopPropagation();
             this.setOpen(!this.open)
@@ -102,7 +93,7 @@ class TreeItem{
     }
 
     updateOpenIndicator(){
-        var openindicator = this.html.querySelector('#openindicator') as HTMLElement
+        var openindicator = this.openindicator
         if(this.children.length == 0){
             openindicator.innerText = ''
         }else if(this.open){
