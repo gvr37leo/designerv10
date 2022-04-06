@@ -1,9 +1,7 @@
 
-header
-
-
-
 (optional)--------
+ancestor/descendant queries
+export import
 listview filter/sort ui
 toaster
 localization
@@ -11,7 +9,7 @@ history
 some sort of way to suggest child types
 advanced text editor
 structs
-sortorder (either sortorder or linkedlist)
+treeview drag and drop/sortorder (either sortorder or linkedlist)
 some way to paginate or stream entities in and out of memory/ui (paginate treeview?)
 security logins loginproviders rbac
 mongodb indexes

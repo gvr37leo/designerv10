@@ -164,7 +164,7 @@ class DetailView{
             this.backrefcontainer.appendChild(typebutton)
         }
 
-        var pointerattributes = designer.groupbytype[findbyname('Attribute')._id].filter(e => e.datatype == findbyname('pointer')._id && (e.pointertype == this.entity.type) && e.name != 'type')
+        var pointerattributes = designer.groupbytype[findbyname('Attribute')._id].filter(e => e.datatype == findbyname('pointer')._id && (e.pointertype == this.entity.type) && e.name != 'type' && e.name != 'parent')
         for(let attribute of pointerattributes){
             let button = stringToHTML(`<button>${deref(attribute.parent).name}.${attribute.name}</button>`)
             button.addEventListener('click',() => {
