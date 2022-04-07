@@ -1,5 +1,9 @@
 
 (optional)--------
+prototype predefined stringlist dropdown/ attributes with more specific properties/ also interesting for datatypes not showing unnescessary data
+maybe give datype attributes
+
+automatic routing (convert name path to entity id and vice versa for backend)
 ancestor/descendant queries
 export import
 listview filter/sort ui
@@ -9,7 +13,7 @@ history
 some sort of way to suggest child types
 advanced text editor
 structs
-treeview drag and drop/sortorder (either sortorder or linkedlist)
+treeview drag and drop/sortorder (either sortorder or linkedlist) prev and or next attribute sounds good
 some way to paginate or stream entities in and out of memory/ui (paginate treeview?)
 security logins loginproviders rbac
 mongodb indexes

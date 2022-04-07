@@ -3,15 +3,12 @@
 class DetailView{
     entity: Entity
     metaEntity: any
-    datatypes: any
-    metaAttributes: any
-    allAttributes: any[]
+    metaAttributes: any[]
     html:HTMLElement
     attributecontainer: HTMLElement
     widgetrefs:any = {}
     listview: ListView
     backrefcontainer: any
-    allObjectDefs: any
 
     //attributes
     //delete
@@ -25,13 +22,8 @@ class DetailView{
     async load(entity:Entity){
         this.entity = entity
         
-
-        this.allObjectDefs = designer.groupbytype[findbyname('ObjectDef')._id]
-        this.allAttributes = designer.groupbytype[findbyname('Attribute')._id]
-        this.datatypes = designer.groupbytype[findbyname('DataType')._id]
-
         this.metaEntity = deref(this.entity.type)
-        this.metaAttributes = children(this.metaEntity._id)
+        this.metaAttributes = getOBjAttributes(this.metaEntity._id)
     }
 
     render(){
@@ -71,27 +63,29 @@ class DetailView{
         if(this.entity.type == findbyname('AppDef')._id){
             var button = stringToHTML(`<button>create ObjDef</button>`)
             button.addEventListener('click',async () => {
-                var objdef = addRandomID(new ObjectDef({
+                var objdef = new ObjectDef({
+                    _id:genID(),
                     name:'new objdef',
-                    parent:this.entity._id
-                }))
-                var newentitys = genDefaultAttributes(objdef._id)
-                newentitys.push(objdef)
-                await createMany(newentitys)
+                    parent:this.entity._id,
+                    extends:findbyname('Entity')._id,
+                })
+                objdef.type = findbyname('ObjectDef')._id
+                await createOne(objdef)
                 designer.refresh()
             })
             qs(this.html,'#btncontainer').appendChild(button)
         }
 
         if(this.entity.type == findbyname('ObjectDef')._id){
-            var button = stringToHTML(`<button>create Attribute</button>`)
+            let button = stringToHTML(`<button>create Attribute</button>`)
             button.addEventListener('click',async () => {
-                var objdef = addRandomID(new Attribute({
+                let attribute = new Attribute({
+                    _id:genID(),
                     name:'new attribute',
                     parent:this.entity._id,
-                    datatype:findbyname('string')._id
-                }))
-                await createOne(objdef)
+                    datatype:findbyname('string')._id,
+                })
+                await createOne(attribute)
                 designer.refresh()
             })
             qs(this.html,'#btncontainer').appendChild(button)
@@ -99,6 +93,7 @@ class DetailView{
 
         qs(this.html,'#btncreate').addEventListener('click',async () => {
             var res = await createOne({
+                _id:genID(),
                 name:'new entity',
                 type:findbyname('Entity')._id,
                 parent:this.entity._id,
@@ -133,7 +128,7 @@ class DetailView{
         this.attributecontainer = this.html.querySelector('#attributecontainer')
         for(let attribute of this.metaAttributes.sort((a,b) => a.sortorder - b.sortorder)){
 
-            let reffedDatatype = this.datatypes.find(e => e._id == attribute.datatype)
+            let reffedDatatype = deref(attribute.datatype)
             let widget = new widgets[reffedDatatype.name]//todo
             this.widgetrefs[attribute.name] = widget
             let attributeitem = cr('div')
@@ -150,7 +145,7 @@ class DetailView{
         //backrefs buttons-----------------------
         let parentbutton = cr('button');text('children');flush();
         parentbutton.addEventListener('click',() => {
-            this.listview.metaAttributes = children(findbyname('Entity')._id)
+            this.listview.metaAttributes = getOBjAttributes(findbyname('Entity')._id)
             this.listview.query({parent:this.entity._id},{})
         })
         this.backrefcontainer.appendChild(parentbutton)
@@ -158,7 +153,7 @@ class DetailView{
         if(this.entity.type == findbyname('ObjectDef')._id){
             let typebutton = cr('button');text('type');flush();
             typebutton.addEventListener('click',() => {
-                this.listview.metaAttributes = children(findbyname('Entity')._id)
+                this.listview.metaAttributes = getOBjAttributes(findbyname('Entity')._id)
                 this.listview.query({type:this.entity._id},{})
             })
             this.backrefcontainer.appendChild(typebutton)
@@ -168,7 +163,7 @@ class DetailView{
         for(let attribute of pointerattributes){
             let button = stringToHTML(`<button>${deref(attribute.parent).name}.${attribute.name}</button>`)
             button.addEventListener('click',() => {
-                this.listview.metaAttributes = children(attribute.parent)
+                this.listview.metaAttributes = getOBjAttributes(attribute.parent)
                 var query = {
                     type:attribute.parent,
                 }
@@ -183,6 +178,15 @@ class DetailView{
         
         return this.html    
     }
+}
+
+function getOBjAttributes(objid){
+    var metaEntity = deref(objid)
+    var result = children(metaEntity._id)
+    if(metaEntity.extends){
+        result = children(metaEntity.extends).concat(result)
+    }
+    return result
 }
 
 function findbyname(name){

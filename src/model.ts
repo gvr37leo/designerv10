@@ -7,6 +7,7 @@ class AppDef extends Entity{
 }
 
 class ObjectDef extends Entity{
+    extends:string
     constructor(data:Partial<ObjectDef>){
         super(data)
         this.type = 'ObjectDef'

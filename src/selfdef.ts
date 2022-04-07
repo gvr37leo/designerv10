@@ -13,30 +13,26 @@ function keeptrack(array,cb:(entity) => any):(entity) => any{
     return newcb
 }
 
-function addRandomID(entity:Entity){
-    entity._id = genID()
-    return entity
-}
-
 function generateSelfDef(){
     var sortorder = 0
     var selfdefEntitys = []
 
-    var dothething = keeptrack(selfdefEntitys,addRandomID)
-    
+    function dothething(entity){
+        entity._id = genID()
+        selfdefEntitys.push(entity)
+        return entity
+    }
 
     var appdef = dothething(new AppDef({
         name:'selfdef',
         parent:null,
     }))
     
-    
     var idtype = dothething(new DataType({
         parent:appdef._id,
         name:'id',
         sortorder:sortorder++,
     }))
-    
     
     var pointertype = dothething(new DataType({
         parent:appdef._id,
@@ -75,30 +71,87 @@ function generateSelfDef(){
     var appdefobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'AppDef',
+        extends: 'Entity',
         sortorder:sortorder++,
     }))
-    genDefaultAttributes(appdefobj._id,selfdefEntitys)
 
     var entityobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'Entity',
         sortorder:sortorder++,
     }))
-    genDefaultAttributes(entityobj._id,selfdefEntitys)
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'_id',
+        datatype:'id',
+        sortorder:1,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'parent',
+        datatype:'pointer',
+        pointertype:'Entity',
+        sortorder:2,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'type',
+        datatype:'pointer',
+        pointertype:'ObjectDef',
+        sortorder:3,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'name',
+        datatype:'string',
+        sortorder:4,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'sortorder',
+        datatype:'number',
+        sortorder:5,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'createdAt',
+        datatype:'datetime',
+        sortorder:6,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'updatedAt',
+        datatype:'datetime',
+        sortorder:7,
+    }))
+    dothething(new Attribute({
+        parent:entityobj._id,
+        name:'status',
+        datatype:'string',
+        sortorder:8,
+    }))
 
     var objectdefobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'ObjectDef',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(objectdefobj._id,selfdefEntitys)
+    dothething(new Attribute({
+        parent:objectdefobj._id,
+        name:'extends',
+        datatype:'pointer',
+        pointertype:'ObjectDef'
+    }))
+    // genDefaultAttributes(objectdefobj._id,selfdefEntitys)
     
     var attributeobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'Attribute',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(attributeobj._id,selfdefEntitys)
+    // genDefaultAttributes(attributeobj._id,selfdefEntitys)
     dothething(new Attribute({
         parent:attributeobj._id,
         name:'pointertype',
@@ -116,8 +169,9 @@ function generateSelfDef(){
         parent:appdef._id,
         name:'DataType',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(datatypeobj._id,selfdefEntitys)
+    // genDefaultAttributes(datatypeobj._id,selfdefEntitys)
 
 
 
@@ -133,15 +187,17 @@ function generateSelfDef(){
         parent:tournamentappdef._id,
         name:'Home',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(home._id,selfdefEntitys)
+    // genDefaultAttributes(home._id,selfdefEntitys)
 
     var tournament = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Tournament',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(tournament._id,selfdefEntitys)
+    // genDefaultAttributes(tournament._id,selfdefEntitys)
     dothething(new Attribute({
         parent:tournament._id,
         name:'startsat',
@@ -152,8 +208,9 @@ function generateSelfDef(){
         parent:tournamentappdef._id,
         name:'Match',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(match._id,selfdefEntitys)
+    // genDefaultAttributes(match._id,selfdefEntitys)
     dothething(new Attribute({
         parent:match._id,
         name:'player1',
@@ -192,15 +249,17 @@ function generateSelfDef(){
         parent:tournamentappdef._id,
         name:'Player',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(player._id,selfdefEntitys)
+    // genDefaultAttributes(player._id,selfdefEntitys)
 
     var signup = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Signup',
         sortorder:sortorder++,
+        extends: 'Entity',
     }))
-    genDefaultAttributes(signup._id,selfdefEntitys)
+    // genDefaultAttributes(signup._id,selfdefEntitys)
     dothething(new Attribute({
         parent:signup._id,
         name:'signup_player',
@@ -258,63 +317,10 @@ function IDifyPointers(entitys){
         if(entity.pointertype){
             entity.pointertype = objdefs.find(e => e.name == entity.pointertype)._id
         }
+        if(entity.extends){
+            entity.extends = objdefs.find(e => e.name == entity.extends)._id
+        }
     }
-}
-
-function genDefaultAttributes(parentid,outputarray = []){
-    var dothething = keeptrack(outputarray,addRandomID)
-
-    dothething(new Attribute({
-        parent:parentid,
-        name:'_id',
-        datatype:'id',
-        sortorder:1,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'parent',
-        datatype:'pointer',
-        pointertype:'Entity',
-        sortorder:2,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'type',
-        datatype:'pointer',
-        pointertype:'ObjectDef',
-        sortorder:3,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'name',
-        datatype:'string',
-        sortorder:4,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'sortorder',
-        datatype:'number',
-        sortorder:5,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'createdAt',
-        datatype:'datetime',
-        sortorder:6,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'updatedAt',
-        datatype:'datetime',
-        sortorder:7,
-    }))
-    dothething(new Attribute({
-        parent:parentid,
-        name:'status',
-        datatype:'string',
-        sortorder:8,
-    }))
-    return outputarray
 }
 
 function arrayupsert(object,arrayname,value){
