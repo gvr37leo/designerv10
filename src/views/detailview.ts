@@ -201,10 +201,30 @@ function siblings(id){
     return children(deref(id).parent)
 }
 
-function children(id){
+function children(id):any[]{
     if(designer.groupbyparent[id]){
         return designer.groupbyparent[id]
     }else{
         return []
     }
+}
+
+function getparent(id){
+    return deref(deref(id).parent)
+}
+
+function ancestor(id,type:string){
+    var current = deref(id)
+    var typeentity = findbyname(type)
+    while(current != null && current.type != typeentity._id){
+        current = deref(current.parent)
+    }
+    return current
+}
+
+function descendants(id,type:string){
+    var foundchildren = children(id)
+    var typeentity = findbyname(type)
+    var result = foundchildren.flatMap(c => children(c._id)).filter(e => e.type == typeentity._id)
+    return result
 }

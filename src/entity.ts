@@ -3,7 +3,7 @@ class Entity{
     parent
     type = "Entity"
     name
-    sortorder
+    next
     createdAt
     updatedAt
     status

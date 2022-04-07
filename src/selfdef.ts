@@ -31,40 +31,34 @@ function generateSelfDef(){
     var idtype = dothething(new DataType({
         parent:appdef._id,
         name:'id',
-        sortorder:sortorder++,
     }))
     
     var pointertype = dothething(new DataType({
         parent:appdef._id,
         name:'pointer',
-        sortorder:sortorder++,
     }))
     
     
     var booltype = dothething(new DataType({
         parent:appdef._id,
         name:'bool',
-        sortorder:sortorder++,
     }))
     
     
     var stringtype = dothething(new DataType({
         parent:appdef._id,
         name:'string',
-        sortorder:sortorder++,
     }))
     
     
     var numbertype = dothething(new DataType({
         parent:appdef._id,
         name:'number',
-        sortorder:sortorder++,
     }))
     
     var datetimetype = dothething(new DataType({
         parent:appdef._id,
         name:'datetime',
-        sortorder:sortorder++,
     }))
     
 
@@ -72,69 +66,59 @@ function generateSelfDef(){
         parent:appdef._id,
         name:'AppDef',
         extends: 'Entity',
-        sortorder:sortorder++,
     }))
 
     var entityobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'Entity',
-        sortorder:sortorder++,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'_id',
         datatype:'id',
-        sortorder:1,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'parent',
         datatype:'pointer',
         pointertype:'Entity',
-        sortorder:2,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'type',
         datatype:'pointer',
         pointertype:'ObjectDef',
-        sortorder:3,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'name',
         datatype:'string',
-        sortorder:4,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
-        name:'sortorder',
-        datatype:'number',
-        sortorder:5,
+        name:'next',
+        datatype:'pointer',
+        pointertype:'Entity'
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'createdAt',
         datatype:'datetime',
-        sortorder:6,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'updatedAt',
         datatype:'datetime',
-        sortorder:7,
     }))
     dothething(new Attribute({
         parent:entityobj._id,
         name:'status',
         datatype:'string',
-        sortorder:8,
     }))
 
     var objectdefobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'ObjectDef',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     dothething(new Attribute({
@@ -148,7 +132,6 @@ function generateSelfDef(){
     var attributeobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'Attribute',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(attributeobj._id,selfdefEntitys)
@@ -168,7 +151,6 @@ function generateSelfDef(){
     var datatypeobj = dothething(new ObjectDef({
         parent:appdef._id,
         name:'DataType',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(datatypeobj._id,selfdefEntitys)
@@ -186,7 +168,6 @@ function generateSelfDef(){
     var home = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Home',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(home._id,selfdefEntitys)
@@ -194,7 +175,6 @@ function generateSelfDef(){
     var tournament = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Tournament',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(tournament._id,selfdefEntitys)
@@ -207,7 +187,6 @@ function generateSelfDef(){
     var match = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Match',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(match._id,selfdefEntitys)
@@ -225,7 +204,7 @@ function generateSelfDef(){
     }))
     dothething(new Attribute({
         parent:match._id,
-        name:'match_tournament',
+        name:'tournament',
         datatype:'pointer',
         pointertype:'Tournament'
     }))
@@ -248,7 +227,6 @@ function generateSelfDef(){
     var player = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Player',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(player._id,selfdefEntitys)
@@ -256,7 +234,6 @@ function generateSelfDef(){
     var signup = dothething(new ObjectDef({
         parent:tournamentappdef._id,
         name:'Signup',
-        sortorder:sortorder++,
         extends: 'Entity',
     }))
     // genDefaultAttributes(signup._id,selfdefEntitys)
